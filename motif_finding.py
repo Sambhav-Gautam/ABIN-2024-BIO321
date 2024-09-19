@@ -36,9 +36,6 @@ def brute_force_motif_search(dna, t, n, l):
         # Construct consensus string with correct case
         consensus_str = ''.join([consensus[i].upper() if current_motifs[0][i].isupper() else consensus[i].lower() for i in range(l)])
 
-        # Print motif and score
-        print(f"Motif: {consensus_str}, Score: {score}")
-
         # Calculate best score
         if score > bestScore:
             bestScore = score
@@ -75,14 +72,17 @@ def hamming_dist(word, seq):
 def MedianStringSearch(sequences, num_sequences, sequence_length, motif_length):
     best_motif = None
     best_distance = float('inf')
+    motifs_by_distance = {}  # Dictionary to store motifs by their distance
 
     for i in range(sequence_length - motif_length + 1):  # Iterate on all possible sequences
         motif = sequences[0][i:i + motif_length]  # Extract motif
 
         total_distance = sum(hamming_dist(motif, seq) for seq in sequences)  # Calculate distance from current motif
 
-        # Print motif and distance
-        print(f"Motif: {motif}, Hamming Distance: {total_distance}")
+        # Store motifs by their distance
+        if total_distance not in motifs_by_distance:
+            motifs_by_distance[total_distance] = []
+        motifs_by_distance[total_distance].append(motif)
 
         # Update best motif found
         if total_distance < best_distance:
@@ -91,6 +91,11 @@ def MedianStringSearch(sequences, num_sequences, sequence_length, motif_length):
 
     print("Best Median Motif:", best_motif)
     print("Best Hamming Distance:", best_distance)
+    
+    # Print all motifs with the same Hamming distance
+    for distance, motifs in motifs_by_distance.items():
+        motifs.sort()
+        print(f"Hamming Distance: {distance}, Motifs: {motifs}")
 
 
 print("Motif Finding Problem Solver\n")
@@ -111,7 +116,7 @@ pattern_length = int(pattern_length)
 # Remove the first line
 DNA = file_lines[1:]
 
-print("\nBrute Force Algorithm: ")
-brute_force_motif_search(DNA, sequences, nucleotides, pattern_length)
+# print("\nBrute Force Algorithm: ")
+# brute_force_motif_search(DNA, sequences, nucleotides, pattern_length)
 print("\nMedian String Algorithm: ")
 MedianStringSearch(DNA, sequences, nucleotides, pattern_length)
