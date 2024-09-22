@@ -1,4 +1,5 @@
 import random
+import matplotlib.pyplot as plt
 
 # Convert symbol to corresponding number
 def symbolToNumber(symbol): 
@@ -113,16 +114,40 @@ def gibbsSampler(dna, k, t, n):
 
 # Hardcoded input data
 k = 6  # Length of k-mers
-t = 5  # Number of DNA sequences
+t = 26  # Number of DNA sequences
 n = 500  # Number of iterations for Gibbs sampling
 
 dna = [
-    "GCGGAAGAGGGCACTAGCCCATGTGAGAGGGCAAGGACCA",
-    "ATCTTTCTCTTAAAAATAACATAATTCAGGGCCAGGATGT",
-    "GTCACGAGCTTTATCCTACAGATGATGAATGCAAATCAGC",
-    "TAAAAGATAATATCGACCCTAGCGTGGCGGGCAAGGTGCT",
-    "GTAGATTCGGGTACCGTTCATAAAAGTACGGGAATTTCGG"
+    "gcggaagagggcactagcccatgtgagagggcaaggacca",
+    "atctttctcttaaaaataacataattcagggccaggatgt",
+    "gtcacgagctttatcctacagatgatgaatgcaaatcagc",
+    "taaaagataatatcgaccctagcgtggcgggcaaggtgct",
+    "gtagattcgggtaccgttcataaaagtacgggaatttcgg",
+    "tatacttttaggtcgttatgttaggcgagggcaaaagtca",
+    "ctctgccgattcggcgagtgatcgaagagggcaatgcctc",
+    "aggatggggaaaatatgagaccaggggagggccacactgc",
+    "acacgtctagggctgtgaaatctctgccgggctaacagac",
+    "gtgtcgatgttgagaacgtaggcgccgaggccaacgctga",
+    "atgcaccgccattagtccggttccaagagggcaactttgt",
+    "ctgcgggcggcccagtgcgcaacgcacagggcaaggttta",
+    "tgtgttgggcggttctgaccacatgcgagggcaacctccc",
+    "gtcgcctaccctggcaattgtaaaacgacggcaatgttcg",
+    "cgtattaatgataaagaggggggtaggaggtcaactcttc",
+    "aatgcttataacataggagtagagtagtgggtaaactacg",
+    "tctgaaccttctttatgcgaagacgcgagggcaatcggga",
+    "tgcatgtctgacaacttgtccaggaggaggtcaacgactc",
+    "cgtgtcatagaattccatccgccacgcggggtaatttgga",
+    "tcccgtcaaagtgccaacttgtgccggggggctagcagct",
+    "acagcccgggaatatagacgcgtttggagtgcaaacatac",
+    "acgggaagatacgagttcgatttcaagagttcaaaacgtg",
+    "cccgataggactaataaggacgaaacgagggcgatcaatg",
+    "ttagtacaaacccgctcacccgaaaggagggcaaatacct",
+    "agcaaggttcagatatacagccaggggagacctataactc",
+    "gtccacgtgcgtatgtactaattgtggagagcaaatcatt"
 ]
+
+for i in range(len(dna)):
+    dna[i] = dna[i].upper()
 
 # Set a random seed for reproducibility
 random.seed(42)
@@ -130,18 +155,52 @@ random.seed(42)
 # Run Gibbs sampler and get initial best motifs
 best = gibbsSampler(dna, k, t, n) 
 best_score = score(best)
+all_scores = []
 
 # Run Gibbs sampler multiple times (500+ iterations) to find better motifs
-for _ in range(500):  
+for _ in range(10):  
     sample = gibbsSampler(dna, k, t, n)
     sample_score = score(sample)
-   
-    print(_ ,sample , " " , sample_score)
+    all_scores.append(sample_score)
+    # print(_ ,sample , " " , sample_score)
     if sample_score < best_score:  # Update best motifs if a better one is found
         best_score = sample_score
         best = sample[:]
 
+# Visualization function
+def visualize_scores(dnas, k, t, n, num_runs):
+    all_scores = []
+    
+    for _ in range(num_runs):
+        sample = gibbsSampler(dnas, k, t, n)
+        score_value = score(sample)
+        all_scores.append(score_value)
+
+    # Plot the average score over iterations
+    avg_scores = [sum(all_scores) / num_runs]
+    
+    plt.figure(figsize=(10, 6))
+    plt.plot(range(num_runs), all_scores, marker='o', label='Individual Scores')
+    plt.axhline(y=avg_scores[0], color='r', linestyle='--', label='Average Score')
+    plt.title("Consensus Motif Scores Over Iterations")
+    plt.xlabel("Iteration")
+    plt.ylabel("Consensus Score")
+    plt.legend()
+    plt.grid()
+    plt.show()
+
+# Call the visualization function
+# visualize_scores(dna, k, t, n, 500)
+
 # Output the best motifs and score
+plt.figure(figsize=(10, 6))
+plt.hist(all_scores, bins=20, alpha=0.7, color='blue', edgecolor='black')
+plt.title("Distribution of Consensus Motif Scores")
+plt.xlabel("Consensus Score")
+plt.ylabel("Frequency")
+plt.grid()
+plt.show()
+
 print("Best Motifs:")
 for motif in best:
     print(motif)
