@@ -117,6 +117,6 @@ pattern_length = int(pattern_length)
 DNA = file_lines[1:]
 
 # print("\nBrute Force Algorithm: ")
-# brute_force_motif_search(DNA, sequences, nucleotides, pattern_length)
+#brute_force_motif_search(DNA, sequences, nucleotides, pattern_length)
 print("\nMedian String Algorithm: ")
 MedianStringSearch(DNA, sequences, nucleotides, pattern_length)
