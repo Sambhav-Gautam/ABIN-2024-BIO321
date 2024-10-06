@@ -1,7 +1,8 @@
 def edit_distance_top_down(seq1, seq2, ins_cost, del_cost, gap_penalty):
     """
     Top-down recursive approach with memoization to compute minimum edit distance with gap penalties.
-
+    Prints the computed DP matrix in a formatted grid.
+    
     Args:
     seq1 (str): First DNA sequence.
     seq2 (str): Second DNA sequence.
@@ -12,8 +13,13 @@ def edit_distance_top_down(seq1, seq2, ins_cost, del_cost, gap_penalty):
     Returns:
     int: The minimum cost of transforming seq1 into seq2.
     """
+    m, n = len(seq1), len(seq2)
+
     # Memoization table to store the already computed values
     memo = {}
+
+    # Create a DP matrix (initialized with None to indicate unvisited cells)
+    dp_matrix = [[None for _ in range(n + 1)] for _ in range(m + 1)]
 
     def helper(i, j, prev_op):
         """
@@ -29,9 +35,13 @@ def edit_distance_top_down(seq1, seq2, ins_cost, del_cost, gap_penalty):
         """
         # Base cases: one of the sequences is exhausted
         if i == len(seq1):
-            return (ins_cost) + (gap_penalty) * (len(seq2) - j - 1)
+            cost = (gap_penalty) * (len(seq2) - j )
+            dp_matrix[i][j] = cost  # Store the value in the matrix
+            return cost
         if j == len(seq2):
-            return (del_cost) + (gap_penalty) * (len(seq1) - i - 1)
+            cost = (gap_penalty) * (len(seq1) - i )
+            dp_matrix[i][j] = cost  # Store the value in the matrix
+            return cost
 
         # Check if the result is already computed
         if (i, j, prev_op) in memo:
@@ -39,7 +49,7 @@ def edit_distance_top_down(seq1, seq2, ins_cost, del_cost, gap_penalty):
 
         # If characters match, no operation needed
         if seq1[i] == seq2[j]:
-            memo[(i, j, prev_op)] = helper(i + 1, j + 1, None)
+            result = helper(i + 1, j + 1, None)
         else:
             # Consider three operations: insert, delete, and substitute
             # Insert operation (add character from seq2 to seq1)
@@ -58,19 +68,33 @@ def edit_distance_top_down(seq1, seq2, ins_cost, del_cost, gap_penalty):
             substitute_cost = 1 + helper(i + 1, j + 1, None)
 
             # Choose the minimum of the three operations
-            memo[(i, j, prev_op)] = min(insert_cost, delete_cost, substitute_cost)
+            result = min(insert_cost, delete_cost, substitute_cost)
 
-        return memo[(i, j, prev_op)]
+        # Memoize and store the result in the matrix
+        memo[(i, j, prev_op)] = result
+        dp_matrix[i][j] = result
+        return result
 
     # Start recursion with no previous operation and indices at the start of both sequences
-    return helper(0, 0, None)
+    result = helper(0, 0, None)
 
-# Example usage with bigger sequences:
-seq1 = "ABC"
-seq2 = "ABCDE"
-ins_cost = 2  # Cost of a single isolated insertion
-del_cost = 2  # Cost of a single isolated deletion
-gap_penalty = 1  # Reduced cost for consecutive insertions or deletions
+    # Printing the DP matrix with formatting
+    print("\nMemoized States (DP Matrix):")
+    print("   " + "   ".join(f"{ch2}" for ch2 in (" ",) + tuple(seq2)))  # Header with seq2 characters
+    for i, row in enumerate(dp_matrix):
+        seq1_char = seq1[i-1] if i > 0 else " "  # Add seq1 characters along rows
+        formatted_row = [f"{x if x is not None else ' '}".rjust(3) for x in row]  # Right-align values in the row
+        print(f"{seq1_char}  " + " ".join(formatted_row))
+
+    return result
+
+# Example usage
+seq1 = "GATTACA"
+seq2 = "GCATGCU"
+
+ins_cost = 1  # Cost of a single isolated insertion
+del_cost = 1  # Cost of a single isolated deletion
+gap_penalty = 0.5  # Reduced cost for consecutive insertions or deletions
 
 min_cost = edit_distance_top_down(seq1, seq2, ins_cost, del_cost, gap_penalty)
-print(f"Minimum edit distance : {min_cost}")
+print(f"\nMinimum edit distance: {min_cost}")
