@@ -35,7 +35,7 @@ def edit_distance_top_down(seq1, seq2, ins_cost, del_cost, gap_penalty):
         """
         # Base cases: one of the sequences is exhausted
         if i == len(seq1):
-            cost = (gap_penalty) * (len(seq2) - j )
+            cost = (gap_penalty) * (len(seq2) - j)
             dp_matrix[i][j] = cost  # Store the value in the matrix
             return cost
         if j == len(seq2):
