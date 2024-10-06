@@ -42,7 +42,8 @@ def pattern_match(pattern, bwt_arr, suffix_arr, last_to_first):
     return [suffix_arr[i] for i in range(top, bottom + 1)]
 
 # Driver code to test the functions
-input_text = "AGTCAAGT$"  # DNA sequence with end marker $
+input_text = "AG"  # DNA sequence with end marker $
+input_text+= "$"
 suffix_arr = compute_suffix_array(input_text)
 bwt_arr = find_last_char(input_text, suffix_arr)
 last_to_first = build_last_to_first(bwt_arr)
